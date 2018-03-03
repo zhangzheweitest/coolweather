@@ -2,6 +2,8 @@ package com.example.zhangzhewei.coolweather;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +16,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.zhangzhewei.coolweather.gson.Forecast;
 import com.example.zhangzhewei.coolweather.gson.Weather;
 import com.example.zhangzhewei.coolweather.util.HttpUtil;
@@ -86,7 +89,7 @@ public class WeatherActivity extends AppCompatActivity {
 
 
 
-//    private ImageView bingPicImg;
+    private ImageView bingPicImg;
 
 
 
@@ -95,7 +98,17 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_weather);
+        if (Build.VERSION.SDK_INT >= 21) {//android5.0以上的系统才能支持
+
+            View decorView = getWindow().getDecorView();
+
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        }
         setContentView(R.layout.activity_weather);
 
         /**
@@ -103,7 +116,7 @@ public class WeatherActivity extends AppCompatActivity {
           */
 
 
-//        bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
+        bingPicImg = findViewById(R.id.bing_pic_img);
 
         weatherLayout =  findViewById(R.id.weather_layout);
 
@@ -140,6 +153,12 @@ public class WeatherActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String weatherString = prefs.getString("weather", null);
+        String bingPic= prefs.getString("bing_pic", null);
+        if(bingPic!=null){
+            Glide.with(this).load(bingPic).into(bingPicImg);
+        }else{
+            loadBingPic();
+        }
         if (weatherString != null) {
 
             // 有缓存时直接解析天气数据
@@ -214,7 +233,6 @@ public class WeatherActivity extends AppCompatActivity {
                     }
 
                 });
-
             }
 
 
@@ -243,8 +261,34 @@ public class WeatherActivity extends AppCompatActivity {
 
         });
 
-//        loadBingPic();
+        loadBingPic();
 
+    }
+    /**
+     * 加载必应每日一图
+     */
+    private void loadBingPic(){
+        String requestBingPic="http://guolin.tech/api/bing_pic";
+        HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String bingPic=response.body().string();
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                editor.putString("bing_pic",bingPic);
+                editor.apply();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+                    }
+                });
+            }
+        });
     }
     /**
 
@@ -276,13 +320,13 @@ public class WeatherActivity extends AppCompatActivity {
 
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
 
-            TextView dateText = (TextView) view.findViewById(R.id.date_text);
+            TextView dateText = view.findViewById(R.id.date_text);
 
-            TextView infoText = (TextView) view.findViewById(R.id.info_text);
+            TextView infoText = view.findViewById(R.id.info_text);
 
-            TextView maxText = (TextView) view.findViewById(R.id.max_text);
+            TextView maxText =  view.findViewById(R.id.max_text);
 
-            TextView minText = (TextView) view.findViewById(R.id.min_text);
+            TextView minText =  view.findViewById(R.id.min_text);
 
             dateText.setText(forecast.date);
 
