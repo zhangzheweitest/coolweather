@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -34,10 +36,8 @@ public class WeatherActivity extends AppCompatActivity {
  * 获取控件实例
  */
 
-//    public DrawerLayout drawerLayout;
-//
-//
-//
+    public DrawerLayout drawerLayout;
+
     public SwipeRefreshLayout swipeRefresh;
 
 
@@ -46,7 +46,7 @@ public class WeatherActivity extends AppCompatActivity {
 
 
 
-//    private Button navButton;
+    private Button navButton;
 
 
 
@@ -145,9 +145,9 @@ public class WeatherActivity extends AppCompatActivity {
 
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
 
-//        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
 
-//        navButton = (Button) findViewById(R.id.nav_button);
+        navButton =  findViewById(R.id.nav_button);
 /**
  * 从储存中以键值对的形式读取数据
  */
@@ -183,6 +183,12 @@ public class WeatherActivity extends AppCompatActivity {
             requestWeather(mWeatherId);
 
         }
+        navButton.setOnClickListener((new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        }));
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
