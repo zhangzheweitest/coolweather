@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.zhangzhewei.coolweather.gson.Forecast;
 import com.example.zhangzhewei.coolweather.gson.Weather;
+import com.example.zhangzhewei.coolweather.service.AutoUpdateService;
 import com.example.zhangzhewei.coolweather.util.HttpUtil;
 import com.example.zhangzhewei.coolweather.util.Utility;
 
@@ -374,9 +375,9 @@ public class WeatherActivity extends AppCompatActivity {
 
         weatherLayout.setVisibility(View.VISIBLE);
 
-//        Intent intent = new Intent(this, AutoUpdateService.class);
-//
-//        startService(intent);
+        Intent intent = new Intent(this, AutoUpdateService.class);
+
+        startService(intent);
 
     }
 }
